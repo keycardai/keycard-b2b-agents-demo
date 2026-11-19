@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Acme · Settings</title>
+<style>
+  /* Acme's own product, as one of its customers' admins sees it: not Keycard, not the IdP. */
+  :root { --bg: #fafaf9; --panel: #fff; --text: #1c1917; --muted: #78716c; --line: #e7e5e4; --brand: #0f766e; --brand-bg: #f0fdfa; --red: #b91c1c; --red-bg: #fef2f2; --green: #047857; --green-bg: #ecfdf5; --code: #f5f5f4; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text); font: 14px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif; }
+  header { background: var(--panel); border-bottom: 1px solid var(--line); padding: 10px 24px; display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+  .logo { font-weight: 700; font-size: 16px; color: var(--brand); text-decoration: none; }
+  .ws { color: var(--muted); }
+  .me { margin-left: auto; color: var(--muted); font-size: 13px; }
+  .me b { color: var(--text); font-weight: 600; }
+  nav.cust { display: flex; gap: 4px; }
+  nav.cust a { color: var(--muted); text-decoration: none; padding: 3px 9px; border-radius: 6px; font-size: 13px; }
+  nav.cust a[aria-current="page"] { background: var(--brand-bg); color: var(--brand); font-weight: 600; }
+  a { color: var(--brand); }
+  main { max-width: 900px; margin: 24px auto; padding: 0 16px; display: grid; gap: 16px; }
+  .crumb { color: var(--muted); font-size: 13px; }
+  h1 { font-size: 22px; margin: 0; }
+  .sub { color: var(--muted); margin: 2px 0 0; }
+  .card { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; }
+  .agent { padding: 16px; display: grid; grid-template-columns: 1fr auto; gap: 4px 16px; align-items: center; border-top: 1px solid var(--line); }
+  .agent:first-child { border-top: 0; }
+  .agent h2 { font-size: 16px; margin: 0; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .agent p { margin: 0; color: var(--muted); }
+  .pill { display: inline-block; font-size: 12px; font-weight: 600; border-radius: 999px; padding: 1px 9px; }
+  .pill.on { color: var(--green); background: var(--green-bg); }
+  .pill.off { color: var(--red); background: var(--red-bg); }
+  .switch { position: relative; display: inline-flex; align-items: center; gap: 10px; cursor: pointer; font-weight: 600; grid-row: span 2; }
+  .switch input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+  .switch .track { width: 44px; height: 24px; border-radius: 999px; background: #d6d3d1; position: relative; transition: background .15s; }
+  .switch .track::after { content: ""; position: absolute; top: 3px; left: 3px; width: 18px; height: 18px; border-radius: 50%; background: #fff; transition: transform .15s; box-shadow: 0 1px 2px rgba(0,0,0,.2); }
+  .switch input:checked + .track { background: var(--brand); }
+  .switch input:checked + .track::after { transform: translateX(20px); }
+  .switch input:focus-visible + .track { outline: 2px solid var(--brand); outline-offset: 2px; }
+  .switch input:disabled + .track { opacity: .5; }
+  .sec { padding: 14px 16px; display: grid; gap: 10px; }
+  .sec h2 { font-size: 14px; margin: 0; }
+  .sec .hint { color: var(--muted); font-size: 13px; margin: -6px 0 0; }
+  .pol { border-top: 1px solid var(--line); padding-top: 10px; display: grid; gap: 4px; }
+  .pol:first-of-type { border-top: 0; padding-top: 0; }
+  .pol .h { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .pol .h b { font-weight: 600; }
+  .pol p { margin: 0; color: var(--muted); font-size: 13px; }
+  .pol summary { cursor: pointer; color: var(--brand); font-size: 13px; width: fit-content; }
+  .pol pre { margin: 6px 0 0; background: var(--code); border-radius: 6px; padding: 8px 10px; font: 12.5px/1.45 ui-monospace, SFMono-Regular, Menlo, monospace; white-space: pre-wrap; overflow-wrap: anywhere; }
+  .line { display: grid; grid-template-columns: 64px 1fr; gap: 10px; font-size: 13.5px; }
+  .line time { color: var(--muted); font-variant-numeric: tabular-nums; }
+  .line.keycard span { color: var(--brand); }
+  .line.bad span { color: var(--red); }
+  .empty, .note { color: var(--muted); font-size: 13px; }
+  .grid { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+  .grid th { text-align: left; font-weight: 600; color: var(--muted); font-size: 12px; padding: 6px 8px; border-bottom: 1px solid var(--line); }
+  .grid td { padding: 8px; border-bottom: 1px solid var(--line); vertical-align: middle; }
+  .grid tr:last-child td { border-bottom: 0; }
+  .grid .risk { color: var(--muted); font-size: 12px; margin-left: 6px; }
+  .seg { display: inline-flex; border: 1px solid var(--line); border-radius: 6px; overflow: hidden; }
+  .seg button { font: inherit; font-size: 12.5px; border: 0; background: #fff; color: var(--muted); padding: 3px 10px; cursor: pointer; }
+  .seg button[aria-pressed="true"].allow { background: var(--green-bg); color: var(--green); font-weight: 600; }
+  .seg button[aria-pressed="true"].block { background: var(--red-bg); color: var(--red); font-weight: 600; }
+  .seg button:disabled { cursor: default; }
+  .hist { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .hist td { padding: 6px 8px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  .hist tr:last-child td { border-bottom: 0; }
+  .hist time { color: var(--muted); font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .hist .why { color: var(--muted); font-size: 12px; }
+  .scroll { overflow-x: auto; }
+  .err { padding: 16px; color: var(--red); }
+  @media (max-width: 600px) { header { padding: 10px 16px; } .me { margin-left: 0; width: 100%; } .agent { grid-template-columns: 1fr; } .switch { grid-row: auto; } }
+</style>
+</head>
+<body>
+<header>
+  <a class="logo" href="/">Acme</a>
+  <span class="ws">Workspace</span>
+  <nav class="cust" id="cust" aria-label="Customer workspace"></nav>
+  <span class="me" id="me"></span>
+</header>
+<main id="main"><p class="note">Loading…</p></main>
+<script>
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const key = location.pathname.split('/')[2];
+let D = null, busy = false, H = '<span class="empty">Loading…</span>';
+const log = [];
+
+async function load() {
+  const r = await fetch(`/api/customers/${encodeURIComponent(key)}`);
+  D = await r.json();
+  if (!r.ok) { $('main').innerHTML = `<div class="card err">${esc(D.error)}</div>`; return; }
+  document.title = `Acme · ${D.customer.name} · AI agents`;
+  $('me').innerHTML = `Signed in as <b>${esc(D.admin)}</b>`;
+  $('cust').innerHTML = D.customers.map(c => `<a href="/customers/${esc(c.key)}/settings" ${c.key === key ? 'aria-current="page"' : ''}>${esc(c.name)}</a>`).join('');
+  render();
+}
+
+function render() {
+  const c = D.customer.name;
+  $('main').innerHTML = `
+    <div><div class="crumb">Settings → AI agents</div><h1>AI agents</h1>
+      <p class="sub">Choose which Acme agents people at ${esc(c)} can use, and what each may do. Changes apply to ${esc(c)} only, on the next request.</p></div>
+    <div class="card">${D.agents.map(a => `<div class="agent">
+      <h2>${esc(a.name)} <span class="pill ${a.on ? 'on' : 'off'}">${a.on ? 'On' : 'Off'}</span></h2>
+      <label class="switch"><input type="checkbox" data-switch="${esc(a.key)}" ${a.on ? 'checked' : ''} ${busy ? 'disabled' : ''} aria-label="${esc(a.name)} for ${esc(c)}"><span class="track"></span><span>${a.on ? 'On' : 'Off'}</span></label>
+      <p>${esc(a.blurb)}</p></div>`).join('')}</div>
+    ${workCard()}
+    <div class="card sec"><h2>Activity</h2><div>${log.length ? log.join('') : '<span class="empty">Changes you make, and what Acme sends to Keycard, appear here.</span>'}</div></div>
+    <div class="card sec"><h2>History</h2><p class="hint">What Acme’s agents asked to do for people at ${esc(c)}, and Keycard’s decision. Newest first.</p><div class="scroll" id="history">${H}</div></div>
+    <div class="card sec"><h2>Policies in force for ${esc(c)}</h2>
+      <p class="hint">Every request an Acme agent makes for someone at ${esc(c)} is decided by these rules, in ${esc(c)}’s own Keycard zone. <a href="${esc(D.console.policySet)}" target="_blank" rel="noopener">Open in Keycard ↗</a></p>
+      ${D.policies.map(p => `<div class="pol"><div class="h"><b>${esc(p.name)}</b><span class="pill ${p.active ? 'on' : 'off'}">${p.active ? 'Active' : 'Not active'}</span></div>
+        <p>${esc(p.description)}</p><details><summary>Rule</summary><pre>${esc(p.cedar)}</pre></details></div>`).join('')}
+    </div>
+    <p class="note">Behind this page, Acme’s backend changes ${esc(c)}’s policies in Keycard through its Management API. ${esc(c)}’s admin never sees Keycard.</p>`;
+}
+
+// One row per tool, one Allow/Block per agent. New tools arrive blocked.
+function workCard() {
+  const RISK = { read: 'read', write: 'changes data', destructive: 'deletes data' };
+  return `<div class="card sec"><h2>What each agent may do in Acme Work</h2>
+    <p class="hint">Applies to ${esc(D.customer.name)} only. A tool Acme adds later stays blocked for every agent until you allow it here.</p>
+    <div class="scroll"><table class="grid"><thead><tr><th>Tool</th>${D.agents.map(a => `<th>${esc(a.name)}</th>`).join('')}</tr></thead><tbody>
+    ${D.tools.map(t => `<tr><td>${esc(t.label)}<span class="risk">${esc(RISK[t.risk] || '')}</span></td>${D.agents.map(a => {
+      const on = a.allowed.includes(t.name);
+      return `<td><span class="seg" role="group" aria-label="${esc(t.label)} for ${esc(a.name)}">
+        <button type="button" class="allow" aria-pressed="${on}" data-work="${esc(a.key)}|${esc(t.name)}|1" ${busy ? 'disabled' : ''}>Allow</button><button type="button" class="block" aria-pressed="${!on}" data-work="${esc(a.key)}|${esc(t.name)}|0" ${busy ? 'disabled' : ''}>Block</button></span></td>`;
+    }).join('')}</tr>`).join('')}
+    </tbody></table></div></div>`;
+}
+
+async function history() {
+  const r = await (await fetch(`/api/customers/${encodeURIComponent(key)}/history`)).json().catch(e => ({ error: e.message, decisions: [] }));
+  const t = at => new Date(at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+  H = r.error ? `<span class="empty">${esc(r.error)}</span>` : !r.decisions.length ? '<span class="empty">Nothing yet in the last three hours.</span>'
+    : `<table class="hist"><tbody>${r.decisions.map(d => `<tr>
+        <td><time>${t(d.at)}</time></td>
+        <td><span class="pill ${d.ok ? 'on' : 'off'}">${d.ok ? 'Allowed' : 'Refused'}</span></td>
+        <td>${esc(d.person || 'No person')} · ${esc(d.agent || '')}<br><span class="why">${esc(d.tool ? `Acme Work: ${d.tool}` : d.resource || '')}${!d.ok && d.policy ? ` · ${esc(d.policy)}` : ''}</span>
+          ${d.link ? ` <a class="why" href="${esc(d.link)}" target="_blank" rel="noopener">Keycard ↗</a>` : ''}</td></tr>`).join('')}</tbody></table>`;
+  const el = $('history'); if (el) el.innerHTML = H;
+}
+
+function addLog(lines) {
+  const t = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+  for (const l of [...lines].reverse()) log.unshift(`<div class="line ${l.who === 'keycard' ? 'keycard' : ''} ${l.ok === false ? 'bad' : ''}"><time>${t}</time><span>${esc(l.text)}</span></div>`);
+}
+
+async function post(url, body) {
+  busy = true; render();
+  const r = await (await fetch(url, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(body) }))
+    .json().catch(err => ({ log: [{ who: 'acme', text: err.message, ok: false }] }));
+  addLog(r.log || []);
+  busy = false; await load();
+}
+document.addEventListener('click', e => {
+  const b = e.target.closest('[data-work]'); if (!b || busy || b.getAttribute('aria-pressed') === 'true') return;
+  const [agent, tool, allow] = b.dataset.work.split('|');
+  post(`/api/customers/${encodeURIComponent(key)}/agents/${agent}/tools`, { tool, allowed: allow === '1' });
+});
+document.addEventListener('change', e => {
+  const a = e.target.dataset?.switch; if (!a || busy) return;
+  post(`/api/customers/${encodeURIComponent(key)}/agents/${a}/switch`, { on: e.target.checked });
+});
+load().then(history);
+setInterval(history, 8000);
+</script>
+</body>
+</html>
