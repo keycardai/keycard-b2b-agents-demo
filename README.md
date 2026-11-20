@@ -84,3 +84,9 @@ This deletes the zones this repo built (they're tagged `[keycard-b2b-agents-demo
 - **Something looks wrong in a zone**: `npm run teardown`, then `npm start` rebuilds everything from scratch.
 
 Local state (zone ids, the app credentials Keycard issued, the IdP's signing key) is in `.state/`, which git ignores.
+
+## License
+
+Apache-2.0 — see [LICENSE](LICENSE) and, for the copyright notice,
+[NOTICE](NOTICE). The Keycard name and logo are trademarks;
+[TRADEMARKS.md](TRADEMARKS.md) states how they may be used.
