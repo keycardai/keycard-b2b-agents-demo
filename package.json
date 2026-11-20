@@ -14,11 +14,11 @@
     "@anthropic-ai/sdk": "^0.131.0",
     "@keycardai/api": "^0.23.0",
     "@keycardai/mcp": "^2.0.2",
-    "@keycardai/oauth": "^0.25.0",
+    "@keycardai/oauth": "^0.28.0",
     "@modelcontextprotocol/sdk": "^1.32.1",
     "express": "^5.2.1",
     "jose": "^6.2.12",
-    "zod": "^3.25.76"
+    "zod": "^4.6.7"
   },
   "devDependencies": {
     "@types/express": "^5.0.6",
